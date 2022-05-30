@@ -6,11 +6,15 @@ from rasa_sdk import Action, Tracker
 from rasa_sdk.events import SlotSet
 from rasa_sdk.executor import CollectingDispatcher
 import requests
+
+#loading data
 f = open('data.json',encoding="mbcs")
 data = json.load(f)
 res=[]
 for faq in data['data']:
   print(faq['ques'])
+
+
 for faq in data['data']:
     fdata=json.dumps({"text":faq["ques"],"message_id": "b28"})
     response=requests.post(url="http://localhost:5005/model/parse",data=fdata)
@@ -18,13 +22,15 @@ for faq in data['data']:
     response_list=json.loads(response.text)
     print(response_list)
     res.append({"ans":faq["ans"],"bot_ans":response_list})
-#print(res)
+
 b=[]
 que=[]
 an=[]
 q1=[]
 qno=[]
 con=[]
+
+#conversion of data into csv file format
 for i in res:
   a=[]
   que.append(i['bot_ans']['text'])
@@ -36,4 +42,6 @@ for i in res:
   
 dict = {'question': que,'question label':qno,'confidence':con,'answer':an,'Top 3 confidence scores':q1}
 df = pd.DataFrame(dict)
+
+#storing data into csv file
 df.to_csv('data_file.csv')
